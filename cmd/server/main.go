@@ -67,7 +67,8 @@ func main() {
 	log.Printf("  GET /api/v1/ping                              - Connectivity probe for Starcat client (auth required)")
 	log.Printf("  GET /api/v1/repos/{repo_id}/recommendations  - Similar repository recommendations (auth required)")
 	log.Printf("  GET /healthz                                  - Health check (public)")
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	handler := middleware.CORS(mux)
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
 
 func healthzHandler(w http.ResponseWriter, r *http.Request) {
