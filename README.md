@@ -53,9 +53,9 @@ brew install --cask starcat
 > Starcat provides hosted defaults for normal users. This API is open source so advanced users can inspect it, run it locally, or deploy their own instance.
 <!-- starcat-promo:end -->
 
-Starcat 相似仓库推荐后端。
+Backend service for Starcat similar-repository recommendations.
 
-第一版通过服务端中转 SimRepo 的非官方 Qdrant Recommend API, 为 Starcat macOS 客户端提供稳定的 `/api/v1/repos/{repo_id}/recommendations` 契约。客户端不直连 SimRepo, 不持有 SimRepo key, 后续可以在本服务内替换为 Starcat 自研推荐 Provider。
+The initial version proxies SimRepo's unofficial Qdrant Recommend API through the server, providing the Starcat macOS client with a stable `/api/v1/repos/{repo_id}/recommendations` contract. The client neither connects directly to SimRepo nor stores a SimRepo key. The provider can later be replaced within this service by Starcat's own recommendation provider.
 
 ## Endpoints
 
