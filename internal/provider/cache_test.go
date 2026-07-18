@@ -45,3 +45,31 @@ func TestCachedProviderCachesSuccess(t *testing.T) {
 		t.Fatalf("cache statuses = %q/%q", first.CacheStatus, second.CacheStatus)
 	}
 }
+
+func TestCachedProviderRemovesExpiredEntryOnRead(t *testing.T) {
+	cached := NewCachedProvider(&countingProvider{}, time.Minute, time.Minute, time.Minute)
+	cached.set("expired", cacheEntry{expiresAt: time.Now().Add(-time.Second)})
+
+	if _, ok := cached.get("expired", time.Now()); ok {
+		t.Fatal("expired entry should miss")
+	}
+	if len(cached.items) != 0 {
+		t.Fatalf("cached items = %d, want 0 after expired read", len(cached.items))
+	}
+}
+
+func TestCachedProviderEvictsEarliestExpiryAtCapacity(t *testing.T) {
+	cached := NewCachedProvider(&countingProvider{}, time.Minute, time.Minute, time.Minute)
+	cached.maxEntries = 2
+	now := time.Now()
+	cached.set("first", cacheEntry{expiresAt: now.Add(time.Minute)})
+	cached.set("second", cacheEntry{expiresAt: now.Add(2 * time.Minute)})
+	cached.set("third", cacheEntry{expiresAt: now.Add(3 * time.Minute)})
+
+	if len(cached.items) != 2 {
+		t.Fatalf("cached items = %d, want bounded size 2", len(cached.items))
+	}
+	if _, ok := cached.items["first"]; ok {
+		t.Fatal("earliest-expiring entry should be evicted")
+	}
+}

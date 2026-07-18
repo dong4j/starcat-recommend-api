@@ -17,9 +17,14 @@ type CachedProvider struct {
 	emptyTTL   time.Duration
 	errorTTL   time.Duration
 
-	mu    sync.RWMutex
-	items map[string]cacheEntry
+	mu         sync.Mutex
+	items      map[string]cacheEntry
+	maxEntries int
 }
+
+// defaultCacheMaxEntries 防止 repoID × limit × offset 的组合键让常驻进程内存无界增长。
+// 10k 条足以覆盖客户端常用查询，同时无需引入额外 LRU 依赖。
+const defaultCacheMaxEntries = 10_000
 
 type cacheEntry struct {
 	result    Result
@@ -34,6 +39,7 @@ func NewCachedProvider(base Provider, successTTL, emptyTTL, errorTTL time.Durati
 		emptyTTL:   emptyTTL,
 		errorTTL:   errorTTL,
 		items:      map[string]cacheEntry{},
+		maxEntries: defaultCacheMaxEntries,
 	}
 }
 
@@ -64,10 +70,15 @@ func (p *CachedProvider) Recommend(ctx context.Context, query Query) (Result, er
 }
 
 func (p *CachedProvider) get(key string, now time.Time) (cacheEntry, bool) {
-	p.mu.RLock()
+	p.mu.Lock()
+	defer p.mu.Unlock()
 	entry, ok := p.items[key]
-	p.mu.RUnlock()
-	if !ok || now.After(entry.expiresAt) {
+	if !ok {
+		return cacheEntry{}, false
+	}
+	if !now.Before(entry.expiresAt) {
+		// 读取时顺手删除过期项，避免低频 key 永久占用容量。
+		delete(p.items, key)
 		return cacheEntry{}, false
 	}
 	return entry, true
@@ -75,8 +86,36 @@ func (p *CachedProvider) get(key string, now time.Time) (cacheEntry, bool) {
 
 func (p *CachedProvider) set(key string, entry cacheEntry) {
 	p.mu.Lock()
+	defer p.mu.Unlock()
+	if _, exists := p.items[key]; !exists && len(p.items) >= p.maxEntries {
+		p.makeRoomLocked(time.Now())
+	}
 	p.items[key] = entry
-	p.mu.Unlock()
+}
+
+// makeRoomLocked 先清理全部过期项；容量仍满时淘汰最早到期项。
+// 这里按 expiresAt 淘汰而非实现完整 LRU，是因为不同结果已有明确 TTL，最早到期项的
+// 剩余复用价值最低，且该策略不需要在每次命中时维护额外链表。
+func (p *CachedProvider) makeRoomLocked(now time.Time) {
+	for key, entry := range p.items {
+		if !now.Before(entry.expiresAt) {
+			delete(p.items, key)
+		}
+	}
+	for len(p.items) >= p.maxEntries {
+		var earliestKey string
+		var earliestExpiry time.Time
+		for key, entry := range p.items {
+			if earliestKey == "" || entry.expiresAt.Before(earliestExpiry) {
+				earliestKey = key
+				earliestExpiry = entry.expiresAt
+			}
+		}
+		if earliestKey == "" {
+			return
+		}
+		delete(p.items, earliestKey)
+	}
 }
 
 func cacheKey(query Query) string {

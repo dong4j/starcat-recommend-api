@@ -81,7 +81,7 @@ Optional:
 - `PORT`: defaults to `5005`.
 - `SIMREPO_ENDPOINT`: defaults to SimRepo's Qdrant recommend endpoint.
 - `CACHE_TTL_SUCCESS_SECONDS`: defaults to 7 days.
-- `CACHE_TTL_EMPTY_SECONDS`: defaults to 6 hours.
+- `CACHE_TTL_EMPTY_SECONDS`: defaults to 1 hour.
 - `CACHE_TTL_ERROR_SECONDS`: defaults to 10 minutes.
 
 ## Local Development
@@ -116,6 +116,8 @@ The current provider chain is:
 ```text
 RecommendHandler -> CachedProvider -> SimRepoProvider -> SimRepo Qdrant API
 ```
+
+`CachedProvider` keeps at most 10,000 `repoID:limit:offset` entries. Expired entries are removed on read; when capacity is reached, the entry with the earliest expiry is evicted.
 
 Future providers should keep the response DTO stable:
 

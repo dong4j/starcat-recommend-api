@@ -42,7 +42,7 @@ func main() {
 	recommendProvider := provider.NewCachedProvider(
 		baseProvider,
 		durationEnv("CACHE_TTL_SUCCESS_SECONDS", 7*24*time.Hour),
-		durationEnv("CACHE_TTL_EMPTY_SECONDS", 6*time.Hour),
+		durationEnv("CACHE_TTL_EMPTY_SECONDS", time.Hour),
 		durationEnv("CACHE_TTL_ERROR_SECONDS", 10*time.Minute),
 	)
 
