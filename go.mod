@@ -1,4 +1,4 @@
-module github.com/dong4j/starcat-recommend-api
+module github.com/starcat-app/starcat-recommend-api
 
 go 1.25.0
 

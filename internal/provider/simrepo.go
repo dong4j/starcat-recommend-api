@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dong4j/starcat-recommend-api/internal/model"
+	"github.com/starcat-app/starcat-recommend-api/internal/model"
 )
 
 const simRepoSource = "simrepo"

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/dong4j/starcat-recommend-api/internal/model"
-	"github.com/dong4j/starcat-recommend-api/internal/provider"
+	"github.com/starcat-app/starcat-recommend-api/internal/model"
+	"github.com/starcat-app/starcat-recommend-api/internal/provider"
 )
 
 const (

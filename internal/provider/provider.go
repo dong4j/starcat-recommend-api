@@ -7,7 +7,7 @@ package provider
 import (
 	"context"
 
-	"github.com/dong4j/starcat-recommend-api/internal/model"
+	"github.com/starcat-app/starcat-recommend-api/internal/model"
 )
 
 type Query struct {

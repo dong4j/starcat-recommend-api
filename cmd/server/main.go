@@ -16,9 +16,9 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/dong4j/starcat-recommend-api/internal/handler"
-	"github.com/dong4j/starcat-recommend-api/internal/middleware"
-	"github.com/dong4j/starcat-recommend-api/internal/provider"
+	"github.com/starcat-app/starcat-recommend-api/internal/handler"
+	"github.com/starcat-app/starcat-recommend-api/internal/middleware"
+	"github.com/starcat-app/starcat-recommend-api/internal/provider"
 )
 
 const (

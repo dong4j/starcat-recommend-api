@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dong4j/starcat-recommend-api/internal/model"
+	"github.com/starcat-app/starcat-recommend-api/internal/model"
 )
 
 func writeJSON[T any](w http.ResponseWriter, data T) {
