@@ -13,7 +13,7 @@ func TestHandlePingV1(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/ping", nil)
 	rr := httptest.NewRecorder()
 
-	HandlePingV1("recommend").ServeHTTP(rr, req)
+	HandlePingV1("recommend", "1.2.3").ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Fatalf("status = %d, want %d", rr.Code, http.StatusOK)
@@ -28,5 +28,8 @@ func TestHandlePingV1(t *testing.T) {
 	}
 	if env.Data.Service != "recommend" || !env.Data.OK {
 		t.Fatalf("unexpected data: %+v", env.Data)
+	}
+	if env.Data.Version != "1.2.3" {
+		t.Fatalf("version = %q, want %q", env.Data.Version, "1.2.3")
 	}
 }

@@ -65,6 +65,12 @@ The initial version proxies SimRepo's unofficial Qdrant Recommend API through th
 | `GET` | `/api/v1/ping` | Yes | Starcat client connectivity probe |
 | `GET` | `/api/v1/repos/{repo_id}/recommendations?limit=10&offset=0` | Yes | Similar repository recommendations |
 
+The authenticated ping response includes the service identity and the build version injected from the release tag:
+
+```json
+{"schema_version":1,"data":{"service":"recommend","version":"1.2.3","ok":true}}
+```
+
 ## Environment
 
 ```bash

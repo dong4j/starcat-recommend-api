@@ -65,6 +65,12 @@ Starcat 相似仓库推荐后端。
 | `GET` | `/api/v1/ping` | Yes | Starcat client connectivity probe |
 | `GET` | `/api/v1/repos/{repo_id}/recommendations?limit=10&offset=0` | Yes | Similar repository recommendations |
 
+鉴权后的 ping 响应包含服务标识，以及由发布 tag 注入的构建版本：
+
+```json
+{"schema_version":1,"data":{"service":"recommend","version":"1.2.3","ok":true}}
+```
+
 ## Environment
 
 ```bash

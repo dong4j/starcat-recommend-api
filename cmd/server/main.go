@@ -19,6 +19,7 @@ import (
 	"github.com/starcat-app/starcat-recommend-api/internal/handler"
 	"github.com/starcat-app/starcat-recommend-api/internal/middleware"
 	"github.com/starcat-app/starcat-recommend-api/internal/provider"
+	"github.com/starcat-app/starcat-recommend-api/internal/version"
 )
 
 const (
@@ -51,7 +52,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", healthzHandler)
-	mux.Handle("GET /api/v1/ping", authMW.Wrap(handler.HandlePingV1("recommend")))
+	mux.Handle("GET /api/v1/ping", authMW.Wrap(handler.HandlePingV1(version.Service, version.Version)))
 	mux.Handle("GET /api/v1/repos/{repo_id}/recommendations", authMW.Wrap(http.HandlerFunc(recommendHandler.HandleRecommendations)))
 
 	go func() {
@@ -62,7 +63,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	log.Printf("starcat-recommend-api starting on port %s", port)
+	log.Printf("starcat-recommend-api %s starting on port %s", version.Version, port)
 	log.Printf("Endpoints:")
 	log.Printf("  GET /api/v1/ping                              - Connectivity probe for Starcat client (auth required)")
 	log.Printf("  GET /api/v1/repos/{repo_id}/recommendations  - Similar repository recommendations (auth required)")
