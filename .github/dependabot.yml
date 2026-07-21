@@ -4,3 +4,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  # 同步维护 workflow 中的第三方 Action 版本，避免只更新 Go 依赖而遗漏 CI 供应链。
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
